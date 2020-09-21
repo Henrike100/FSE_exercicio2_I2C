@@ -15,7 +15,7 @@ while(True):
     #mylcd.lcd_clear()
     mylcd.lcd_display_string_pos("T:{:.2f}".format(dado.temperature), 1, 0)
     mylcd.lcd_display_string_pos("U:{:.2f}".format(dado.humidity), 1, 9)
-    mylcd.lcd_display_string("P:{:.2f} **".format(dado.pressure), 2)
+    mylcd.lcd_display_string("P:{:.2f}".format(dado.pressure), 2)
 
     sleep(1)
     

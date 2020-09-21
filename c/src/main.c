@@ -254,6 +254,9 @@ void print_sensor_data(struct bme280_data *comp_data, double *temp, double *pres
 int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev) {
     FILE *file;
     file = fopen ("arquivo.csv", "w+");
+    fprintf(file, "Temperatura, Umidade, Pressão\n");
+    fclose(file);
+    
     /* Variable to define the result */
     int8_t rslt = BME280_OK;
 
@@ -282,17 +285,17 @@ int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev) {
         return rslt;
     }
 
-    fprintf(file, "Temperatura, Umidade, Pressão\n");
-
     /*Calculate the minimum delay required between consecutive measurement based upon the sensor enabled
      *  and the oversampling configuration. */
 
     //req_delay = bme280_cal_meas_delay(&dev->settings);
     req_delay = 1000000;
 
+    int contador = 0;
+    double temp = 0, press = 0, hum = 0;
+
     /* Continuously stream sensor data */
     while (1) {
-        int contador = 0;
         /* Set the sensor to forced mode */
         rslt = bme280_set_sensor_mode(BME280_FORCED_MODE, dev);
         if (rslt != BME280_OK)
@@ -310,21 +313,21 @@ int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev) {
             break;
         }
 
-        double temp = 0, press = 0, hum = 0;
-
         print_sensor_data(&comp_data, &temp, &press, &hum);
 
         contador++;
 
         if(contador == 10) {
             temp /= 10; press /= 10; hum /= 10;
+
+            file = fopen ("arquivo.csv", "a+");
             fprintf(file, "%0.2lf deg C, %0.2lf%%, %0.2lf hPa\n", temp, hum, press);
+            fclose(file);
+
             contador = 0;
             temp = press = hum = 0;
         }
     }
-
-    fclose(file);
 
     return rslt;
 }
